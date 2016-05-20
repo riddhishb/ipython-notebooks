@@ -22,6 +22,32 @@ import numpy as np
 
 x=label=weight=N=dim=T=None
 #Code to enter the values of these variables
+N =1000
+x = np.random.randn(N,2) #dim=2
+
+s = (N,1)
+#label = np.zeros(s) #linear separation example
+label = np.zeros(s) #nonlinea separation example
+#for index in range(0,N):
+    #label[index] = x[index][0] < x[index][1]
+for index in range(0,N):
+    label[index] = (x[index][0]**2 + x[index][1]**2) < 1
+    
+label = label * 1.0
+
+
+
+pos1 = np.nonzero(label == 1)
+pos2 = np.where(label==0)[0]
+label[pos2] = -1
+
+#plots the data
+
+plt.plot(x[pos1,0], x[pos1,1], 'b*')
+plt.plot(x[pos2,0], x[pos2,1], 'r*')
+plt.axis([-3,3,-3,3])
+plt.title("Original data")
+plt.show()
 
 
 
