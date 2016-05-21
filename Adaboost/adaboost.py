@@ -69,26 +69,28 @@ for t in range(T):
 
     alpha[t] = 0.5 * np.log((1-err[t])/err[t])
     # % we update D so that wrongly classified samples will have more weight
-    weight = weight * np.exp(-alpha[t] * label * weaklearner(h[t,0],h[t,1],h[t,2],x));
-    weight = weight / np.sum(weight);
+    weight = weight * np.exp(-alpha[t] * label[:,0] * weaklearner(h[t,0],h[t,1],h[t,2],x))
+    weight = weight / np.sum(weight)
 
 
 finalLabel = np.zeros_like(label);
+finalLabel = finalLabel.astype(np.float64)
 misshits = np.zeros(T)
 
 print "Testing"
 
 for t in range(T):
 
-    finalLabel = finalLabel + alpha[t] * weaklearner(h[t,0],h[t,1],h[t,2],x);
-    tfinalLabel = np.sign(finalLabel);
-    misshits[t] = np.sum((tfinalLabel != label[:,0]).astype(np.int64))/N;    
+    finalLabel[:,0] = finalLabel[:,0] + alpha[t] * weaklearner(h[t,0],h[t,1],h[t,2],x)
+    tfinalLabel = np.sign(finalLabel[:,0])
+    misshits[t] = np.sum((tfinalLabel != label[:,0]).astype(np.float64))/N   
     
-    pos1 = np.where(tfinalLabel == 1);
-    pos2 = np.where(tfinalLabel == -1);
+    pos1 = np.where(tfinalLabel == 1)
+    pos2 = np.where(tfinalLabel == -1)
 
 
 print "Results"
+
 plt.figure()
 plt.plot(x[pos1, 0], x[pos1, 1], 'b*')
 plt.plot(x[pos2, 0], x[pos2, 1], 'r*')
