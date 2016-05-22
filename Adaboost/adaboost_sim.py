@@ -21,7 +21,7 @@ The following variables are used:
 import numpy as np
 import matplotlib.pyplot as plt
 
-T=20
+T=10
 dim=2
 N =1000
 
@@ -91,6 +91,7 @@ for t in range(T):
 				[tmpe,y] = weakClassifier_error(i,j,k,x,weight,label)
 				if(tmpe < err[t]): #storing the better classifier in h
 					err[t] = tmpe
+					y0 = y
 					h[t][0]=i
 					h[t][1]=j
 					h[t][2]=k	 		  
@@ -105,7 +106,7 @@ for t in range(T):
 
 	for i in range(N):          #Reassign weigths for next iteration
 		
-		if(y[i]==1):
+		if(y0[i]==1):
 			weight[i] = np.float64(weight[i]* np.exp(alpha[t]))
 		else:
 			weight[i] = np.float64(weight[i]* np.exp(-alpha[t]))
