@@ -37,21 +37,17 @@ for index in range(0,N):   #nonlinear separation example
 	
 label = label * 1.0
 
-
-
 pos1 = np.nonzero(label == 1)
 pos2 = np.where(label==0)
 label[pos2] = -1
 
 #plots the data
 
+plt.figure()
 plt.plot(x[pos1,0], x[pos1,1], 'b*')
 plt.plot(x[pos2,0], x[pos2,1], 'r*')
 plt.axis([-3,3,-3,3])
 plt.title("Original data")
-plt.show()
-
-
 
 #Actual program begins
 
@@ -87,27 +83,26 @@ def weakClassifier_error(i,j,k): #Returns the error on the data for a given dist
 	return temp_err
 
 
-
+err  = np.ones(T, dtype = np.float64) * np.inf
 
 for t in range(T):
-	err= np.float64(np.inf)
 	for i in threshold:
 		for j in range(dim):
 			for k in [-1,1]:
 				tmpe= weakClassifier_error(i,j,k)
-				if(tmpe < err): #storing the better classifier in h
-					err = tmpe
+				if(tmpe < err[t]): #storing the better classifier in h
+					err[t] = tmpe
 					h[t][0]=i
 					h[t][1]=j
 					h[t][2]=k	 		  
 						 
-						  
-
-	if(err > 0.5): 
-		T= t; print t, "Error!"    #We have run out of weak classifiers! So truncate the no: of iterations used
+						 
+	if(err[t] > 0.5): 
+		T= t
+		print t, "Error!"    #We have run out of weak classifiers! So truncate the no: of iterations used
 		break  
 
-	alpha[t] = 0.5 * np.log((1.0-err)/err)
+	alpha[t] = 0.5 * np.log((1.0-err[t])/err[t])
 	
 	sum=np.float64(0)
 	for i in range(N):          #Reassign weigths for next iteration
@@ -145,6 +140,7 @@ for i in range(N):
 pos1 = np.where(final_label == 1)
 pos2 = np.where(final_label== -1)
 
+plt.figure()
 plt.plot(x[pos1,0], x[pos1,1], 'b*')
 plt.plot(x[pos2,0], x[pos2,1], 'r*')
 plt.axis([-3,3,-3,3])
