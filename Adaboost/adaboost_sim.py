@@ -21,11 +21,31 @@ The following variables are used:
 import numpy as np
 import matplotlib.pyplot as plt
 
-#x=label=weight=N=dim=T=None
-#Code to enter the values of these variables
 T=20
 dim=2
 N =1000
+
+def weakClassifier_error(i,j,k,x,weight,label): #Returns the error on the data for a given distribution of weights
+								 #Takes the threshold, dimension of data and the 'sign' as input
+
+	temp_err= np.float64(0) #The output of this function
+	temp= np.int64(0)
+	y=np.zeros(N, dtype = np.int64) #Initialise actual and expected labels to a perfect match( 0 = match , 1 = not a match)
+	
+	for p in range(N):
+          temp = np.sign(x[p][j] - i)
+          if(k == -1):      #Note that k is the 'sign', i is threshold, j is the dimension
+			temp = -temp
+
+          if(temp != label[p]): 
+			temp_err = np.float64(temp_err + weight[p])
+			y[p]=1  #This indicates a mismatch between known and generated label at this position. 
+			        #To be used later in reassigning the weights.
+
+	return [temp_err,y]
+
+#x=label=weight=N=dim=T=None
+#Code to enter the values of these variables
 x = np.random.randn(N,2) #dim=2
 
 label = np.zeros(N, dtype= np.int64) 
@@ -60,28 +80,7 @@ threshold=np.arange(-3.0,3.0,0.1) #This was the range in the MATLAB example. Can
 weight = np.ones(N, dtype = np.float64) / (N)
 
 y=np.zeros(N, dtype = np.int64) #To be used in the following function. If the assigned label does NOT match the label of the weak 
-              #classifier, for say the i'th data point, then a 'flag' is raised by setting y[i] to 1.
-
-
-def weakClassifier_error(i,j,k): #Returns the error on the data for a given distribution of weights
-								 #Takes the threshold, dimension of data and the 'sign' as input
-
-	temp_err= np.float64(0) #The output of this function
-	temp= np.int64(0)
-	y=np.zeros(N, dtype = np.int64) #Initialise actual and expected labels to a perfect match( 0 = match , 1 = not a match)
-	
-	for p in range(N):
-          temp = np.sign(x[p][j] - i)
-          if(k == -1):      #Note that k is the 'sign', i is threshold, j is the dimension
-			temp = -temp
-
-          if(temp != label[p]): 
-			temp_err = np.float64(temp_err + weight[p])
-			y[p]=1  #This indicates a mismatch between known and generated label at this position. 
-			        #To be used later in reassigning the weights.
-
-	return temp_err
-
+#classifier, for say the i'th data point, then a 'flag' is raised by setting y[i] to 1.
 
 err  = np.ones(T, dtype = np.float64) * np.inf
 
@@ -89,13 +88,12 @@ for t in range(T):
 	for i in threshold:
 		for j in range(dim):
 			for k in [-1,1]:
-				tmpe= weakClassifier_error(i,j,k)
+				[tmpe,y] = weakClassifier_error(i,j,k,x,weight,label)
 				if(tmpe < err[t]): #storing the better classifier in h
 					err[t] = tmpe
 					h[t][0]=i
 					h[t][1]=j
 					h[t][2]=k	 		  
-						 
 						 
 	if(err[t] > 0.5): 
 		T= t
@@ -104,7 +102,7 @@ for t in range(T):
 
 	alpha[t] = 0.5 * np.log((1.0-err[t])/err[t])
 	
-	sum=np.float64(0)
+
 	for i in range(N):          #Reassign weigths for next iteration
 		
 		if(y[i]==1):
@@ -112,11 +110,7 @@ for t in range(T):
 		else:
 			weight[i] = np.float64(weight[i]* np.exp(-alpha[t]))
 
-		sum=sum+weight[i]	
-
-	weight = np.float64(weight/sum)
-		
-
+	weight = weight / np.sum(weight)
 
 
 temp_sum = np.float64(0)
