@@ -1,21 +1,21 @@
 """
 All matrices used are implemented via numpy.
-
 The following variables are used:
 -> N: The number of samples or data-points.
 -> T: The number of iterations in our boosting algorithm.
 -> dim: The number of parameters recorded for each data-point.
-        (for an image we can choose R,G and B intensities as features and then dim=3)
--> x: The data. It is an N x dim matrix. 
+        (for an image we can choose RGB intensities as features and then dim=3)
+-> x: The data. It is an N x dim matrix.
 -> label: N x 1 array that stores the known labels for each data-point.
--> final_label: N x 1 array that stores the labels generated for each data-point by the final strong classifier.
--> weight: N x 1 array that stores the weight for each data-point.
--> h: T x 3 array that stores the weak classifiers selected after each iteration:
+-> final_label: Nx1 array that stores the labels generated for each data-point
+                by the final strong classifier.
+-> weight: Nx1 array that stores the weight for each data-point.
+-> h: Tx3 array that stores the weak classifiers selected after each iteration:
        h[index][0]= threshold
        h[index][1]= dim (data dimension)
        h[index][2]= pos (the sign of the classifier, +1/-1)
--> alpha: T x 1 array that stores the weight of each weak classifier chosen to make up the final classifier.
-
+-> alpha: T x 1 array that stores the weight of each weak classifier chosen to
+            make up the final classifier.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,7 +31,9 @@ temp = np.zeros(N, dtype=np.int64)
 
 # Returns error and calculated labels corresponding to
 def weakClassifier_error(i, j, k, x, weight, label):
-                                                # threshold i, dimension j, sign k on dataset x.
+                                                # threshold i
+                                                # dimension j
+                                                # sign k on dataset x.
                                                 # Original labels are stored in
                                                 # label
 
