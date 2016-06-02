@@ -13,14 +13,39 @@ def possion_solver(dest_gs,source_gs, mask):
   mask1 = np.zeros(1, tot_pixels)
   h = mask.shape[0]
   w = mask.shape[1]
+
+  mode = 1 # Set to 2 if Mixed Gradients is desired
+
   sigma = []
   for i in range(mask.shape[0]):
     for j in range(mask.shape[1]):
-    	if (mask[i,j] != 0) sigma.append([i,j])
+    	if (mask[i,j] != 0): sigma.append([i,j])
   for [i,j] in sigma:
     mask1[(i-1)*w + j]=1
     A[(i-1)*w +j, (i-1)*w +j]=4
-    if (mask[])
+    if (mask[i-1,j]>0): A[(i-1)*w+j,(i-2)*w+j]=-1
+    else: b[(i-1)*w+j,1]= b[(i-1)*w +j,1] + dest_gs[i-1,j]
+
+    if (mask[i+1,j]>0): A[(i-1)*w+j,(i)*w+j]=-1
+    else: b[(i-1)*w+j,1]= b[(i-1)*w +j,1] + dest_gs[i+1,j]
+
+    if (mask[i,j-1]>0): A[(i-1)*w+j,(i-1)*w+j-1]=-1
+    else: b[(i-1)*w+j,1]= b[(i-1)*w +j,1] + dest_gs[i,j-1]
+
+    if (mask[i,j+1]>0): A[(i-1)*w+j,(i-1)*w+j+1]=-1
+    else: b[(i-1)*w+j,1]= b[(i-1)*w +j,1] + dest_gs[i-1,j+1]
+
+    # Adding the gradient field
+    vs = 4*source_gs[i,j]-(source_gs[i-1,j]+source_gs[i+1,j]+source_gs[i,j-1]+source_gs[i,j+1])
+    b[(i-1)*w+j, 1] = b[(i-1)*w+j, 1] + vs
+
+  mask1 = np.asarray([1 if mask1[i]>0 else 0 for i in range(mask1.size)]) # Vectorised :D
+  
+
+
+
+
+
 
 # Read images and make a naive clone
 dest = im.open("images/dest.jpg",0)
