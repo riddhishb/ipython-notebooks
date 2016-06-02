@@ -6,21 +6,21 @@ import scipy.misc as spmi
 import matplotlib.pyplot as plt
 
 def possion_solver(dest_gs,source_gs, mask):
-	tot_pixels = mask.size
-	A = scipy.sparse.dok_matrix((tot_pixels,tot_pixels), dtype=np.float32)
-	b = np.zeros(tot_pixels, dtype = np.float32)
-	pix = mask.nonzero()
-	mask1 = np.zeros(1, tot_pixels)
-	# y = pix[0][i]
-	# x = pix[1][i]
-    # pix = np.transpose(np.nonzeros(mask)) would give ordered pair directly
-    sigma = [];
-    for i in range(mask.shape[0]):
-    	for j in range(mask.shape[1]):
-    		if (mask[i,j] != 0) sigma.append([i,j])
-
-    for [i,j] in sigma:
-    	
+  tot_pixels = mask.size
+  A = scipy.sparse.dok_matrix((tot_pixels,tot_pixels), dtype=np.float32)
+  b = np.zeros(tot_pixels, dtype = np.float32)
+  pix = mask.nonzero()
+  mask1 = np.zeros(1, tot_pixels)
+  h = mask.shape[0]
+  w = mask.shape[1]
+  sigma = []
+  for i in range(mask.shape[0]):
+    for j in range(mask.shape[1]):
+    	if (mask[i,j] != 0) sigma.append([i,j])
+  for [i,j] in sigma:
+    mask1[(i-1)*w + j]=1
+    A[(i-1)*w +j, (i-1)*w +j]=4
+    if (mask[])
 
 # Read images and make a naive clone
 dest = im.open("images/dest.jpg",0)
