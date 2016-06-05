@@ -41,10 +41,26 @@ def possion_solver(dest_gs,source_gs, mask):
     b[(i-1)*w+j] = b[(i-1)*w+j] + vs
 
   mask1 = np.asarray([1 if mask1[i]>0 else 0 for i in range(mask1.size)]) # Vectorised :D
+  b = np.asarray(b);
   b = b[np.where(mask1>0)[0]]
+  print b.size
+  count =0
   for i in range(mask1.size):
     if mask1[i]==0:
-      A = np.delete(A, i, axis=0); A=np.delete(A,i,axis=1);
+      A = np.delete(A,i-count,axis=0); A=np.delete(A,i-count,axis=1);
+      count = count+1
+
+
+
+  #for i in range(mask1.size):
+  #  if mask1[i]==0:
+  #    A = np.delete(A, i, axis=0); A=np.delete(A,i,axis=1);
+  #    i = i-1;
+  print A.shape
+  x = np.linalg.lstsq(A.T, b)[0];
+  print x.shape
+
+
 
 
 
@@ -70,4 +86,4 @@ final_img = possion_solver(dest, source, mask);
 # Now perform the possion editing for r,g,b channels?
 # plot the results
 # plt.imshow(final_img)
-cv2.imshow("Final", final_img); cv2.waitKey(0); cv2.destroyAllWindows();
+#cv2.imshow("Final", final_img); cv2.waitKey(0); cv2.destroyAllWindows();
