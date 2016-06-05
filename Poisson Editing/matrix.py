@@ -37,11 +37,14 @@ def possion_solver(dest_gs,source_gs, mask):
     else: b[(i-1)*w+j]= b[(i-1)*w +j] + dest_gs[i-1,j+1]
 
     # Adding the gradient field
-    vs = 1000000 + 4*source_gs[i,j]-(source_gs[i-1,j]+source_gs[i+1,j]+source_gs[i,j-1]+source_gs[i,j+1])
-    b[(i-1)*w+j] = b[(i-1)*w+j] + vs - 1000000
+    vs = 4*source_gs[i,j]-(source_gs[i-1,j]+source_gs[i+1,j]+source_gs[i,j-1]+source_gs[i,j+1])
+    b[(i-1)*w+j] = b[(i-1)*w+j] + vs
 
   mask1 = np.asarray([1 if mask1[i]>0 else 0 for i in range(mask1.size)]) # Vectorised :D
   b = b[np.where(mask1>0)[0]]
+  for i in range(mask1.size):
+    if mask1[i]==0:
+      A = np.delete(A, i, axis=0); A=np.delete(A,i,axis=1);
 
 
 
