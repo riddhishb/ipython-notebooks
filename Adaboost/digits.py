@@ -17,7 +17,7 @@ The following variables are used:
 -> alpha: T x 1 array that stores the weight of each weak classifier chosen to
             make up the final classifier.
 -> final_alpha: Stores the weights for all the digits.
--> final_h: Stores the classifiers for all the digits.            
+-> final_h: Stores the classifiers for all the digits.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,8 +74,8 @@ def weakClassifier_error(i, j, k, x, weight, label):
 # Actual program begins
 threshold = np.arange(0, 1.0, 0.05)
 # h and alpha together completely specify the final strong classifier
-final_alpha = np.zeros(10, T)
-final_h = np.zeros(10, T)
+final_alpha = np.zeros((10, T), dtype=np.int64)
+final_h = np.zeros((10, T, 3), dtype=np.int64)
 
 for p in range(10):
     h = np.zeros([T, 3], dtype=np.float64)
@@ -84,7 +84,7 @@ for p in range(10):
 
     label = np.zeros(N, dtype=np.int64)
     label = label * 1.0
-    label[p * 100: p * 100 + 99] = 1
+    label[p * 100: p * 100 + 100] = 1
     label[np.where(label == 0)] = -1
 
     weight = np.ones(N, dtype=np.float64) / (N)  # Initialise weights
@@ -124,6 +124,32 @@ for p in range(10):
 
     final_alpha[p] = alpha
     final_h[p] = h
+
+
+with open('images_training.txt', 'rb') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    x = list(reader)
+
+x = np.array(x, dtype=np.float64)
+
+temp_sum = np.zeros(N, dtype=np.float64)
+temp = np.zeros(N, dtype=np.float64)
+final_label = np.zeros((10, N), dtype=np.float64)
+misshits = np.zeros(T)
+
+for p in range(10):
+    label[100 * p: 100 * p + 100] = p
+
+label = np.int64(label)
+
+for t in range(T):  # Calculate final labels
+    for p in range(10):
+        row = final_h[p][t][1] / 13
+        col = final_h[p][t][1] % 13
+        temp = final_h[p][t][2] * \
+            np.sign(x[row, col: 13000: 13] - final_h[p][t][0])
+        temp_sum = np.float64(temp_sum + final_alpha[p][t] * temp)
+        final_label[p] = np.sign(temp_sum)
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
