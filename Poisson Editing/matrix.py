@@ -52,11 +52,8 @@ def possion_solver(dest_gs,source_gs, mask):
 
 
 
-  #for i in range(mask1.size):
-  #  if mask1[i]==0:
-  #    A = np.delete(A, i, axis=0); A=np.delete(A,i,axis=1);
-  #    i = i-1;
-  print A.shape
+ 
+  print A.shape #gives null here.. WHY!? Works fine elseways
   x = np.linalg.lstsq(A.T, b)[0];
   print x.shape
 
