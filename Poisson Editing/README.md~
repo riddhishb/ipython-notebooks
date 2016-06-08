@@ -14,4 +14,4 @@ To run the shell and the notebook you will need the following packages:
 You can install these by yourself or run the `setup.sh` file.
 
 
-This is the first attempt at implementing the geometric approach. Suggestions and improvements are welcome. Also, we are working on implementing the Algebraic version using Python. The MATLAB version can be found [here](https://github.com/PrieureDeSion/matlabcodes/tree/master/Seamless_Cloning). Collaborators welcome!
+This is the first attempt at implementing the geometric approach. Suggestions and improvements are welcome. Also, we are working on implementing the Algebraic version using Python. The MATLAB version can be found here. Collaborators welcome!
