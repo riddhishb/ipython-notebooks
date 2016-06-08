@@ -1,6 +1,6 @@
 # Poisson Image Editing
 ## Seamless Cloning
-<font color="Blue">### Dhruv Ilesh Shah | Riddhish Bhalodia </font>
+### <font color="Blue"> Dhruv Ilesh Shah | Riddhish Bhalodia </font>
 
 This folder contains the notebook to achieve Seamless Cloning using the Poisson Solver. You can find the notebook [here](Seamless_Cloning.ipynb).
 
