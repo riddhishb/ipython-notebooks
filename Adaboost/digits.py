@@ -18,6 +18,12 @@ The following variables are used:
             make up the final classifier.
 -> final_alpha: Stores the weights for all the digits.
 -> final_h: Stores the classifiers for all the digits.
+
+for p in range(10):
+    all_label[np.where(final_label[p] == 1)] = p
+
+error = np.sum(np.float64(all_label != label)) / N
+print error
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,8 +80,8 @@ def weakClassifier_error(i, j, k, x, weight, label):
 # Actual program begins
 threshold = np.arange(0, 1.0, 0.05)
 # h and alpha together completely specify the final strong classifier
-final_alpha = np.zeros((10, T), dtype=np.int64)
-final_h = np.zeros((10, T, 3), dtype=np.int64)
+final_alpha = np.zeros((10, T), dtype=np.float64)
+final_h = np.zeros((10, T, 3), dtype=np.float64)
 
 for p in range(10):
     h = np.zeros([T, 3], dtype=np.float64)
@@ -132,7 +138,7 @@ with open('images_training.txt', 'rb') as csvfile:
 
 x = np.array(x, dtype=np.float64)
 
-temp_sum = np.zeros(N, dtype=np.float64)
+temp_sum = np.zeros((10, N), dtype=np.float64)
 temp = np.zeros(N, dtype=np.float64)
 final_label = np.zeros((10, N), dtype=np.float64)
 misshits = np.zeros(T)
@@ -141,6 +147,7 @@ for p in range(10):
     label[100 * p: 100 * p + 100] = p
 
 label = np.int64(label)
+all_label = np.full(N, -1, dtype=np.int64)
 
 for t in range(T):  # Calculate final labels
     for p in range(10):
@@ -148,8 +155,12 @@ for t in range(T):  # Calculate final labels
         col = final_h[p][t][1] % 13
         temp = final_h[p][t][2] * \
             np.sign(x[row, col: 13000: 13] - final_h[p][t][0])
-        temp_sum = np.float64(temp_sum + final_alpha[p][t] * temp)
-        final_label[p] = np.sign(temp_sum)
+        temp_sum[p] = np.float64(temp_sum[p] + final_alpha[p][t] * temp)
+        final_label[p] = np.sign(temp_sum[p])
 
+for p in range(10):
+    all_label[np.where(final_label[p] == 1)] = p
 
+error = np.sum(np.float64(all_label != label))
+print error
 print("--- %s seconds ---" % (time.time() - start_time))
