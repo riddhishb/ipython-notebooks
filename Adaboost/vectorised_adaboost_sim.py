@@ -16,39 +16,20 @@ The following variables are used:
        h[index][2]= pos (the sign of the classifier, +1/-1)
 -> alpha: T x 1 array that stores the weight of each weak classifier chosen to
             make up the final classifier.
--> final_alpha: Stores the weights for all the digits.
--> final_h: Stores the classifiers for all the digits.
-
-for p in range(10):
-    all_label[np.where(final_label[p] == 1)] = p
-
-error = np.sum(np.float64(all_label != label)) / N
-print error
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import csv
 start_time = time.time()
 
-
-with open('images_training.txt', 'rb') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-    x = list(reader)
-
-x = np.array(x, dtype=np.float64)
-# this array is of size 13x13000, for all the 1000 13x13 images 100 for
-# each digit 0 to 9
-
 T = 20
-dim = 169
+dim = 2
 N = 1000
 
 temp = np.zeros(N, dtype=np.int64)
 
+
 # Returns error and calculated labels corresponding to
-
-
 def weakClassifier_error(i, j, k, x, weight, label):
                                                 # threshold i
                                                 # dimension j
@@ -56,17 +37,15 @@ def weakClassifier_error(i, j, k, x, weight, label):
                                                 # Original labels are stored in
                                                 # label
 
-    j_row = j / 13
-    j_col = j % 13
     temp_err = np.float64(0)
     # Initialise actual and expected labels to a perfect match( 0 = match , 1
     # = not a match)
     y = np.zeros(N, dtype=np.int64)
 
     if(k == 1):
-        temp = (x[j_row, j_col:13000:13] >= i)
+        temp = (x[:, j] >= i)
     else:
-        temp = (x[j_row, j_col:13000:13] < i)
+        temp = (x[:, j] < i)
 
     temp = np.int64(temp)
     temp[np.where(temp == 0)] = -1
@@ -77,90 +56,98 @@ def weakClassifier_error(i, j, k, x, weight, label):
     return [temp_err, y]
 
 
+x = np.random.randn(N, 2)  # dim=2
+
+label = np.zeros(N, dtype=np.int64)
+
+# label = x[:,0] < x[:,1]  #linear separation example
+label = (x[:, 0]**2 + x[:, 1]**2) < 1  # nonlinear separation example
+
+
+label = label * 1.0
+
+pos1 = np.nonzero(label == 1)
+pos2 = np.where(label == 0)
+label[pos2] = -1
+
+# Plot the data
+
+plt.figure()
+plt.plot(x[pos1, 0], x[pos1, 1], 'b*')
+plt.plot(x[pos2, 0], x[pos2, 1], 'r*')
+plt.axis([-3, 3, -3, 3])
+plt.title("Original data")
+
 # Actual program begins
-threshold = np.arange(0, 1.0, 0.05)
+
 # h and alpha together completely specify the final strong classifier
-final_alpha = np.zeros((10, T), dtype=np.float64)
-final_h = np.zeros((10, T, 3), dtype=np.float64)
+h = np.zeros([T, 3], dtype=np.float64)
+alpha = np.zeros(T, dtype=np.float64)
 
-for p in range(10):
-    h = np.zeros([T, 3], dtype=np.float64)
-    alpha = np.zeros(T, dtype=np.float64)
-    temp = np.zeros(N, dtype=np.int64)
+threshold = np.arange(-3.0, 3.0, 0.1)
 
-    label = np.zeros(N, dtype=np.int64)
-    label = label * 1.0
-    label[p * 100: p * 100 + 100] = 1
-    label[np.where(label == 0)] = -1
+weight = np.ones(N, dtype=np.float64) / (N)  # Initialise weights
 
-    weight = np.ones(N, dtype=np.float64) / (N)  # Initialise weights
+# Initially set error to infinity, to allow comparing with error of classifiers
+err = np.ones(T, dtype=np.float64) * np.inf
 
-    # Initially set error to infinity, to allow comparing with error of
-    # classifiers
-    err = np.ones(T, dtype=np.float64) * np.inf
+for t in range(T):
+    for i in threshold:
+        for j in range(dim):
+            for k in [-1, 1]:
+                [tmpe, y] = weakClassifier_error(i, j, k, x, weight, label)
+                if(tmpe < err[t]):  # storing the better classifier in h
+                    err[t] = tmpe
+                    y0 = y
+                    h[t][0] = i
+                    h[t][1] = j
+                    h[t][2] = k
 
-    for t in range(T):
-        for i in threshold:
-            for j in range(dim):
-                for k in [-1, 1]:
-                    [tmpe, y] = weakClassifier_error(i, j, k, x, weight, label)
-                    if(tmpe < err[t]):  # storing the better classifier in h
-                        err[t] = tmpe
-                        y0 = y
-                        h[t][0] = i
-                        h[t][1] = j
-                        h[t][2] = k
+    if(err[t] > 0.5):
+        T = t
+        # We have run out of weak classifiers! So truncate the no: of
+        # iterations used
+        print t, "Error!"
+        break
 
-        if(err[t] > 0.5):
-            T = t
-            # We have run out of weak classifiers! So truncate the no: of
-            # iterations used
-            print t, "Error!"
-            break
+    alpha[t] = 0.5 * np.log((1.0 - err[t]) / err[t])
 
-        alpha[t] = 0.5 * np.log((1.0 - err[t]) / err[t])
+    # y0=0 corresponded to correctly labelled datapoints. To reassign weights,
+    y0[np.where(y0 == 0)] = -1
+    # we need -1 and not 0 at these positions
 
-        # y0=0 corresponded to correctly labelled datapoints. To reassign
-        # weights,
-        y0[np.where(y0 == 0)] = -1
-        # we need -1 and not 0 at these positions
+    weight = np.float64(weight * np.exp(alpha[t] * y0))  # Reassign weights
 
-        weight = np.float64(weight * np.exp(alpha[t] * y0))  # Reassign weights
-        weight = weight / np.sum(weight)  # Normalise reassigned weights
-
-    final_alpha[p] = alpha
-    final_h[p] = h
+    weight = weight / np.sum(weight)  # Normalise reassigned weights
 
 
-with open('images_training.txt', 'rb') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-    x = list(reader)
-
-x = np.array(x, dtype=np.float64)
-
-temp_sum = np.zeros((10, N), dtype=np.float64)
+temp_sum = np.zeros(N, dtype=np.float64)
 temp = np.zeros(N, dtype=np.float64)
-final_label = np.zeros((10, N), dtype=np.float64)
+final_label = np.zeros(N, dtype=np.float64)
 misshits = np.zeros(T)
 
-for p in range(10):
-    label[100 * p: 100 * p + 100] = p
-
-label = np.int64(label)
-all_label = np.full(N, -1, dtype=np.int64)
-
 for t in range(T):  # Calculate final labels
-    for p in range(10):
-        row = final_h[p][t][1] / 13
-        col = final_h[p][t][1] % 13
-        temp = final_h[p][t][2] * \
-            np.sign(x[row, col: 13000: 13] - final_h[p][t][0])
-        temp_sum[p] = np.float64(temp_sum[p] + final_alpha[p][t] * temp)
-        final_label[p] = np.sign(temp_sum[p])
+    temp = h[t][2] * np.sign(x[:, h[t][1]] - h[t][0])
+    temp_sum = np.float64(temp_sum + alpha[t] * temp)
+    final_label = np.sign(temp_sum)
+    misshits[t] = np.sum(np.float64(final_label != label)) / N
 
-for p in range(10):
-    all_label[np.where(final_label[p] == 1)] = p
 
-error = np.sum(np.float64(all_label != label))
-print error
+# Now plot the generated labels
+pos1 = np.where(final_label == 1)
+pos2 = np.where(final_label == -1)
+
+plt.figure()
+plt.plot(x[pos1, 0], x[pos1, 1], 'b*')
+plt.plot(x[pos2, 0], x[pos2, 1], 'r*')
+plt.axis([-3, 3, -3, 3])
+plt.title("Generated data")
+plt.show()
+
+# Plot miss hits when more and more weak learners are used
+plt.figure()
+plt.plot(misshits)
+plt.ylabel('Miss hists')
+plt.show()
+
 print("--- %s seconds ---" % (time.time() - start_time))
