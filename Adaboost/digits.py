@@ -19,11 +19,6 @@ The following variables are used:
 -> final_alpha: Stores the weights for all the digits.
 -> final_h: Stores the classifiers for all the digits.
 
-for p in range(10):
-    all_label[np.where(final_label[p] == 1)] = p
-
-error = np.sum(np.float64(all_label != label)) / N
-print error
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -157,10 +152,13 @@ for t in range(T):  # Calculate final labels
             np.sign(x[row, col: 13000: 13] - final_h[p][t][0])
         temp_sum[p] = np.float64(temp_sum[p] + final_alpha[p][t] * temp)
         final_label[p] = np.sign(temp_sum[p])
+    for p in range(10):
+        all_label[np.where(final_label[p] == 1)] = p
+    misshits[t] = np.sum(np.float64(all_label != label)) / N
 
-for p in range(10):
-    all_label[np.where(final_label[p] == 1)] = p
+plt.figure()
+plt.plot(misshits)
+plt.ylabel('Miss hists')
+plt.show()
 
-error = np.sum(np.float64(all_label != label))
-print error
 print("--- %s seconds ---" % (time.time() - start_time))
