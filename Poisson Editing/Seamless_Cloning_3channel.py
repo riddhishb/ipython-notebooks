@@ -23,12 +23,10 @@ def process_layer(bs, bt, b, sigma):
         print a
     return bs
 
-im_cloned = cv2.imread("sky_cloned.jpg")
-im_mask = cv2.imread("sky_mask.jpg",0)
+im_cloned = cv2.imread("football_cloned.jpg")
+im_mask = cv2.imread("football_mask.jpg",0)
 
 it = 300; # Set number of iterations
-
-
 
 im_temp = im_cloned.copy()
 im_seamless = im_temp.copy()
