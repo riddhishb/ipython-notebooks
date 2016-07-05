@@ -19,8 +19,11 @@ im1 = np.reshape(im1, np.size(im1))
 im2 = np.reshape(im2, np.size(im2))
 
 # uint8 takes values from 0 to 255
-im1 = im1 / 255.0 - np.mean(im1)
-im2 = im2 / 255.0 - np.mean(im2)
+im1 = im1 / 255.0
+im2 = im2 / 255.0
+# Making sure that the expected value vanishes
+im1 = im1 - np.mean(im1)
+im2 = im2 - np.mean(im2)
 
 # Output information about the image dimensions.
 a = im1.shape
