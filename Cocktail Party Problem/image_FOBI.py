@@ -67,8 +67,9 @@ d_n, Y = LA.eigh(cov2)
 
 source = np.dot(np.transpose(Y), xn)
 
-out1 = np.reshape(source[0], (800, 800))
-out2 = np.reshape(source[1], (800, 800))
+print source.shape
+out1 = np.reshape(source[0, :], (800, 800))
+out2 = np.reshape(source[1, :], (800, 800))
 
 
 cv2.imshow("Figure 1", out1)
