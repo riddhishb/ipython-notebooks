@@ -1,18 +1,16 @@
 """
-Cocktail Party Problem solved via Independent Component Analysis.
+Mixed Images Separation performed via Independent Component Analysis.
 The Fourth Order Blind Identification(FOBI) ICA is implemented here.
 """
 # Import packages.
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.io import wavfile
 from scipy import linalg as LA
-from numpy import linalg
 import cv2
 
 # Import the images
-im1 = cv2.imread("blend1.png", 0)
-im2 = cv2.imread("blend2.png", 0)
+im1 = cv2.imread("Images/blend1.png", 0)
+im2 = cv2.imread("Images/blend2.png", 0)
 
 # Generate linear signals out of these
 im1 = np.reshape(im1, np.size(im1))
@@ -20,9 +18,8 @@ im2 = np.reshape(im2, np.size(im2))
 
 # uint8 takes values from 0 to 255
 im1 = im1 / 255.0
-im2 = im2 / 255.0
-# Making sure that the expected value vanishes
 im1 = im1 - np.mean(im1)
+im2 = im2 / 255.0
 im2 = im2 - np.mean(im2)
 
 # Output information about the image dimensions.
@@ -30,6 +27,8 @@ a = im1.shape
 n = a[0]
 print "Number of samples: ", n
 n = n * 1.0
+
+time = np.arange(0, n, 1)
 
 # x is our initial data matrix.
 x = [im1, im2]
@@ -60,7 +59,7 @@ plt.xlabel('Signal 1')
 plt.title("Whitened data")
 
 # Perform FOBI.
-norm_xn = np.apply_along_axis(np.linalg.norm, 0, xn)
+norm_xn = LA.norm(xn, axis=0)
 # norm_xn = LA.norm(xn, axis=0)
 norm = [norm_xn, norm_xn]
 
@@ -70,10 +69,8 @@ d_n, Y = LA.eigh(cov2)
 
 source = np.dot(np.transpose(Y), xn)
 
-print source.shape
-out1 = np.reshape(source[0, :], (800, 800))
-out2 = np.reshape(source[1, :], (800, 800))
-
+out1 = 10 * np.reshape(source[0], (800, 800))
+out2 = 10 * np.reshape(source[1], (800, 800))
 
 cv2.imshow("Figure 1", out1)
 cv2.imshow("Figure 2", out2)
