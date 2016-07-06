@@ -82,22 +82,26 @@ w0 = w0 / LA.norm(w0)
 while (abs(abs(np.dot(np.transpose(w0), w1)) - 1) > 0.01):
     w0 = w1
     w1 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w1), xn)))) / \
-        n - np.dot(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=2), w1)
+        n - np.transpose(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=1))*w1
     w1 = w1 / LA.norm(w1)
 
 w2 = RNDN(dim, 1)
-w2 = w2 / LA.norm(w1)
+w2 = w2 / LA.norm(w2)
 
 w0 = RNDN(dim, 1)
 w0 = w0 / LA.norm(w0)
 
-while abs(abs(np.dot(np.transpose(w0), w2)) - 1) > 0.001:
+while (abs(abs(np.dot(np.transpose(w0), w2)) - 1) > 0.01):
     w0 = w2
     w2 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w2), xn)))) / \
-        n - np.dot(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=2), w1)
-    w2 = w2 / LA.norm(w1)
+        n - np.transpose(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=1))*w2
+    w2 = w2 - np.dot(np.transpose(w2), w1)*w1
+    w2 = w2 / LA.norm(w2)
 
 w = np.transpose([np.transpose(w1), np.transpose(w2)])
 s = np.dot(w, x)
-s1 = s[0]
-s2 = s[1]
+s1 = np.asarray(s[0], dtype=np.int16)
+s2 = np.asarray(s[1], dtype=np.int16)
+
+wavfile.write('out1.wav', samplingRate, np.transpose(s1))
+wavfile.write('out2.wav', samplingRate, np.transpose(s2))
