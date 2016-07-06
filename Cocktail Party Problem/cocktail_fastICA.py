@@ -19,8 +19,8 @@ def dg(x):
     out = 1 - g(x) * g(x)
     return out
 
-#Dimension
-dim =2
+# Dimension
+dim = 2
 
 # Input the data from the first receiver.
 samplingRate, signal1 = wavfile.read('mic1.wav')
@@ -82,7 +82,7 @@ w0 = w0 / LA.norm(w0)
 while (abs(abs(np.dot(np.transpose(w0), w1)) - 1) > 0.01):
     w0 = w1
     w1 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w1), xn)))) / \
-        n - np.transpose(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=1))*w1
+        n - np.transpose(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=1)) * w1
     w1 = w1 / LA.norm(w1)
 
 w2 = RNDN(dim, 1)
@@ -94,14 +94,19 @@ w0 = w0 / LA.norm(w0)
 while (abs(abs(np.dot(np.transpose(w0), w2)) - 1) > 0.01):
     w0 = w2
     w2 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w2), xn)))) / \
-        n - np.transpose(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=1))*w2
-    w2 = w2 - np.dot(np.transpose(w2), w1)*w1
+        n - np.transpose(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=1)) * w2
+    w2 = w2 - np.dot(np.transpose(w2), w1) * w1
     w2 = w2 / LA.norm(w2)
 
+# Forming the source signal matrix
 w = np.transpose([np.transpose(w1), np.transpose(w2)])
 s = np.dot(w, x)
-s1 = np.asarray(s[0], dtype=np.int16)
-s2 = np.asarray(s[1], dtype=np.int16)
 
+# Converting to numpy array of type float16; Multiplication Factor to make
+# it audible
+s1 = np.asarray(s[0] * 1000, dtype=np.float16)
+s2 = np.asarray(s[1] * 1000, dtype=np.float16)
+
+# Storing numpy array as audio
 wavfile.write('out1.wav', samplingRate, np.transpose(s1))
 wavfile.write('out2.wav', samplingRate, np.transpose(s2))
