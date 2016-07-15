@@ -1,6 +1,7 @@
 """
 Cocktail Party Problem solved via Independent Component Analysis.
-The fastICA algorithm is implemented here, using negentropy as a measure of non-gaussianity.
+The fastICA algorithm is implemented here,
+using negentropy as a measure of non-gaussianity.
 """
 # Import packages.
 import matplotlib.pyplot as plt
@@ -70,7 +71,9 @@ plt.xlabel('Signal 1')
 plt.title("Whitened data")
 # plt.show()
 
-# Now that we have the appropriate signal, we proceed to implement fastICA on the source signal 'x'
+# Now that we have the appropriate signal,
+# we proceed to implement fastICA on the source signal 'x'
+
 # Creating random weight vector
 w1 = RNDN(dim, 1)
 w1 = w1 / LA.norm(w1)
@@ -80,14 +83,14 @@ w0 = w0 / LA.norm(w0)
 
 
 # Running the fixed-point algorithm, with gradient descent
-
-epsilon = 0.01 # Determines the extent of convergence
-alpha = 1 # Step-size for gradient-descent
+epsilon = 0.01  # Determines the extent of convergence
+alpha = 1  # Step-size for gradient-descent
 
 while (abs(abs(np.dot(np.transpose(w0), w1)) - 1) > epsilon):
     w0 = w1
     w1 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w1), xn)))) / \
-        n - alpha*np.transpose(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=1)) * w1
+        n - alpha * \
+        np.transpose(np.mean(np.dot(dg(np.transpose(w1)), xn), axis=1)) * w1
     w1 = w1 / LA.norm(w1)
 
 w2 = RNDN(dim, 1)
@@ -99,7 +102,8 @@ w0 = w0 / LA.norm(w0)
 while (abs(abs(np.dot(np.transpose(w0), w2)) - 1) > 0.01):
     w0 = w2
     w2 = np.dot(xn, np.transpose(g(np.dot(np.transpose(w2), xn)))) / \
-        n - alpha*np.transpose(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=1)) * w2
+        n - alpha * \
+        np.transpose(np.mean(np.dot(dg(np.transpose(w2)), xn), axis=1)) * w2
     w2 = w2 - np.dot(np.transpose(w2), w1) * w1
     w2 = w2 / LA.norm(w2)
 
@@ -107,11 +111,48 @@ while (abs(abs(np.dot(np.transpose(w0), w2)) - 1) > 0.01):
 w = np.transpose([np.transpose(w1), np.transpose(w2)])
 s = np.dot(w, x)
 
+# Plot the separated sources.
+time = np.arange(0, n, 1)
+time = time / samplingRate
+time = time * 1000  # convert to milliseconds
+
+plt.figure()
+plt.plot(time, s[0][0], color='k')
+plt.ylabel('Amplitude')
+plt.xlabel('Time (ms)')
+plt.title("Generated signal 1")
+
+plt.figure()
+plt.plot(time, s[1][0], color='k')
+plt.ylabel('Amplitude')
+plt.xlabel('Time (ms)')
+plt.title("Generated signal 2")
+
+# Plot the actual sources for comparison.
+samplingRate, orig1 = wavfile.read('source1.wav')
+orig1 = orig1 / 255.0 - 0.5  # uint8 takes values from 0 to 255
+
+plt.figure()
+plt.plot(time, orig1, color='k')
+plt.ylabel('Amplitude')
+plt.xlabel('Time (ms)')
+plt.title("Original signal 1")
+
+samplingRate, orig2 = wavfile.read('source2.wav')
+orig2 = orig2 / 255.0 - 0.5  # uint8 takes values from 0 to 255
+
+plt.figure()
+plt.plot(time, orig2, color='k')
+plt.ylabel('Amplitude')
+plt.xlabel('Time (ms)')
+plt.title("Original signal 2")
+
+
 # Converting to numpy array of type float16; Multiplication Factor to make
 # it audible
-s1 = np.asarray(s[0] * 1000, dtype=np.float16)
-s2 = np.asarray(s[1] * 1000, dtype=np.float16)
+# s1 = np.asarray(s[0] * 1000, dtype=np.float16)
+# s2 = np.asarray(s[1] * 1000, dtype=np.float16)
 
 # Storing numpy array as audio
-wavfile.write('out1.wav', samplingRate, np.transpose(s1))
-wavfile.write('out2.wav', samplingRate, np.transpose(s2))
+# wavfile.write('out1.wav', samplingRate, np.transpose(s1))
+# wavfile.write('out2.wav', samplingRate, np.transpose(s2))
