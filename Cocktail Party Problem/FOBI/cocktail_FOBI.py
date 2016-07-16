@@ -4,6 +4,7 @@ The Fourth Order Blind Identification(FOBI) ICA is implemented here.
 """
 # Import packages.
 import matplotlib.pyplot as plt
+from scipy import signal
 import numpy as np
 from scipy.io import wavfile
 from scipy import linalg as LA
@@ -99,3 +100,17 @@ plt.plot(time, orig2, color='k')
 plt.ylabel('Amplitude')
 plt.xlabel('Time (ms)')
 plt.title("Original signal 2")
+
+plt.figure()
+f, t, S = signal.spectrogram(source[0])
+plt.pcolormesh(t, f, S)
+plt.ylabel('Frequency [Hz]')
+plt.xlabel('Time [sec]')
+plt.title('Spectrogram of Output 1')
+
+plt.figure()
+f, t, S = signal.spectrogram(source[1])
+plt.pcolormesh(t, f, S)
+plt.ylabel('Frequency [Hz]')
+plt.xlabel('Time [sec]')
+plt.title('Spectrogram of Output 2')

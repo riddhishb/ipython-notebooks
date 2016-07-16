@@ -5,6 +5,7 @@ using negentropy as a measure of non-gaussianity.
 """
 # Import packages.
 import matplotlib.pyplot as plt
+from scipy import signal
 import numpy as np
 from scipy.io import wavfile
 from scipy import linalg as LA
@@ -147,6 +148,19 @@ plt.ylabel('Amplitude')
 plt.xlabel('Time (ms)')
 plt.title("Original signal 2")
 
+plt.figure()
+f, t, S = signal.spectrogram(s[0][0])
+plt.pcolormesh(t, f, S)
+plt.ylabel('Frequency [Hz]')
+plt.xlabel('Time [sec]')
+plt.title('Spectrogram of Output 1')
+
+plt.figure()
+f, t, S = signal.spectrogram(s[1][0])
+plt.pcolormesh(t, f, S)
+plt.ylabel('Frequency [Hz]')
+plt.xlabel('Time [sec]')
+plt.title('Spectrogram of Output 2')
 
 # Converting to numpy array of type float16; Multiplication Factor to make
 # it audible
