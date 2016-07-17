@@ -164,9 +164,9 @@ plt.title('Spectrogram of Output 2')
 
 # Converting to numpy array of type float16; Multiplication Factor to make
 # it audible
-# s1 = np.asarray(s[0] * 1000, dtype=np.float16)
-# s2 = np.asarray(s[1] * 1000, dtype=np.float16)
+s1 = np.asarray(s[0] * 1000, dtype=np.float16)
+s2 = np.asarray(s[1] * 1000, dtype=np.float16)
 
 # Storing numpy array as audio
-# wavfile.write('out1.wav', samplingRate, np.transpose(s1))
-# wavfile.write('out2.wav', samplingRate, np.transpose(s2))
+wavfile.write('out1.wav', samplingRate, np.transpose(s1))
+wavfile.write('out2.wav', samplingRate, np.transpose(s2))

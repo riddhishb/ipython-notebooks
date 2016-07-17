@@ -114,3 +114,7 @@ plt.pcolormesh(t, f, S)
 plt.ylabel('Frequency [Hz]')
 plt.xlabel('Time [sec]')
 plt.title('Spectrogram of Output 2')
+
+# Storing numpy array as audio
+wavfile.write('FOBI/Sounds/out1.wav', samplingRate, np.transpose(source[0]))
+wavfile.write('FOBI/Sounds/out2.wav', samplingRate, np.transpose(source[1]))
